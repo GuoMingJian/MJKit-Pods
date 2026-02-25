@@ -23,6 +23,14 @@ Pod::Spec.new do |s|
   'Core/**/*.xcassets'
   ]
   s.public_header_files = 'Core/**/*.h'
+
+  # 添加以下配置来解决部署目标警告
+  s.pod_target_xcconfig = {
+    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0'
+  }
+  s.user_target_xcconfig = {
+    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0'
+  }
   
   # 依赖第三方
   s.dependency 'HandyJSON', '~> 5.0.2'
