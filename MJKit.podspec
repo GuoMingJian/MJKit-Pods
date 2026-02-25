@@ -9,7 +9,11 @@ Pod::Spec.new do |s|
   s.author          = { '郭明健' => '1339601489@qq.com' }
   s.homepage        = 'https://github.com/GuoMingJian/MJKit-Pods'
   # 本地库不需要真实的 git 源
-  s.source          = { :git => '' }
+  # 修正 source - 指向你的 GitHub 仓库
+  s.source          = { 
+    :git => 'https://github.com/GuoMingJian/MJKit-Pods.git', 
+    :tag => s.version.to_s 
+  }
   
   s.platform        = :ios, '14.0'
   s.swift_version   = '5.0'
