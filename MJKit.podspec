@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
     :tag => s.version
   }
 
-  s.ios.deployment_target = "12.0"
+  s.ios.deployment_target = "14.0"
   s.swift_versions        = ['5.0']
   s.source_files          = 'Core/**/*.{h,m,swift}'
   s.resources             = [
@@ -36,3 +36,7 @@ Pod::Spec.new do |s|
   s.dependency 'MobileVLCKit', '~> 3.6.0'
 
 end
+
+## 本地库 （MJKit跟Podfile文件同级）
+#pod 'MJKit', :path => './MJKit'
+#
