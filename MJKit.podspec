@@ -10,26 +10,46 @@ Pod::Spec.new do |s|
     :git => 'https://github.com/GuoMingJian/MJKit-Pods.git' , 
     :tag => s.version.to_s 
   }
+  
   s.ios.deployment_target = '14.0'
-  #s.platform        = :ios, '14.0'
   s.swift_version   = '5.0'
+  
   s.source_files    = 'Core/**/*.{h,m,swift}'
   s.resources       = [
-  'Core/**/*.bundle',
-  'Core/**/*.xcassets'
+    'Core/**/*.bundle',
+    'Core/**/*.xcassets'
   ]
   s.public_header_files = 'Core/**/*.h'
   
-  # 依赖第三方
-  s.dependency 'MJRefresh', '~> 3.7.9'
-  s.dependency 'EmptyDataSet-Swift', '~> 5.0.0'
-  s.dependency 'SnapKit', '~> 5.7.1'
-  s.dependency 'Then', '~> 3.0.0'
-  s.dependency 'HXPhotoPicker', '~> 5.0.4'
-  s.dependency 'ZLPhotoBrowser', '~> 4.5.8'
-  s.dependency 'SDWebImage', '~> 5.21.1'
-  s.dependency 'AliyunOSSiOS', '~> 2.11.1'
-  s.dependency 'NVActivityIndicatorView', '~> 5.2.0'
-  s.dependency 'KeychainAccess', '~> 4.2.2'
-  s.dependency 'MobileVLCKit', '~> 3.6.0'
+  # 关键配置：强制所有依赖使用 iOS 14.0
+  s.pod_target_xcconfig = {
+    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
+    'VALID_ARCHS' => 'arm64 x86_64',
+    # 完全禁用 libarclite
+    'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) __clang__=1',
+    # 忽略所有警告
+    'GCC_WARN_INHIBIT_ALL_WARNINGS' => 'YES',
+    'SWIFT_SUPPRESS_WARNINGS' => 'YES'
+  }
+  
+  s.user_target_xcconfig = {
+    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
+    'GCC_WARN_INHIBIT_ALL_WARNINGS' => 'YES',
+    'SWIFT_SUPPRESS_WARNINGS' => 'YES'
+  }
+  
+  # 依赖第三方 - 使用特定版本
+  s.dependency 'MJRefresh', '3.7.9'
+  s.dependency 'EmptyDataSet-Swift', '5.0.0'
+  s.dependency 'SnapKit', '5.7.1'
+  s.dependency 'Then', '3.0.0'
+  s.dependency 'HXPhotoPicker', '5.0.4'
+  s.dependency 'ZLPhotoBrowser', '4.5.8'
+  s.dependency 'SDWebImage', '5.21.1'
+  s.dependency 'AliyunOSSiOS', '2.11.1'
+  s.dependency 'NVActivityIndicatorView', '5.2.0'
+  s.dependency 'KeychainAccess', '4.2.2'
+  s.dependency 'MobileVLCKit', '3.6.0'
 end
