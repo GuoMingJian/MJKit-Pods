@@ -19,16 +19,6 @@ Pod::Spec.new do |s|
   'Core/**/*.xcassets'
   ]
   s.public_header_files = 'Core/**/*.h'
-
-  # 解决 libarclite 错误的关键配置
-  s.pod_target_xcconfig = {
-    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0',
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'
-  }
-  s.user_target_xcconfig = {
-    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0',
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'
-  }
   
   # 依赖第三方
   s.dependency 'MJRefresh', '~> 3.7.9'
