@@ -11,9 +11,12 @@ Pod::Spec.new do |s|
   # 本地库不需要真实的 git 源
   # 修正 source - 指向你的 GitHub 仓库
   s.source          = { 
-    :git => 'https://github.com/GuoMingJian/MJKit-Pods.git', 
+    :git => 'git@github.com:GuoMingJian/MJKit-Pods.git', 
     :tag => s.version.to_s 
   }
+
+  #'git@github.com:GuoMingJian/MJKit-Pods.git'
+  #'https://github.com/GuoMingJian/MJKit-Pods.git' 
   
   s.platform        = :ios, '14.0'
   s.swift_version   = '5.0'
