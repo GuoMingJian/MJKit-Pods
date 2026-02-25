@@ -11,12 +11,9 @@ Pod::Spec.new do |s|
   # 本地库不需要真实的 git 源
   # 修正 source - 指向你的 GitHub 仓库
   s.source          = { 
-    :git => 'git@github.com:GuoMingJian/MJKit-Pods.git', 
+    :git => 'https://github.com/GuoMingJian/MJKit-Pods.git' , 
     :tag => s.version.to_s 
-  }
-
-  #'git@github.com:GuoMingJian/MJKit-Pods.git'
-  #'https://github.com/GuoMingJian/MJKit-Pods.git' 
+  } 
   
   s.platform        = :ios, '14.0'
   s.swift_version   = '5.0'
@@ -26,14 +23,6 @@ Pod::Spec.new do |s|
   'Core/**/*.xcassets'
   ]
   s.public_header_files = 'Core/**/*.h'
-
-  # 添加以下配置来解决部署目标警告
-  s.pod_target_xcconfig = {
-    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0'
-  }
-  s.user_target_xcconfig = {
-    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0'
-  }
   
   # 依赖第三方
   s.dependency 'HandyJSON', '~> 5.0.2'
