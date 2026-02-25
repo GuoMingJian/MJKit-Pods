@@ -20,6 +20,7 @@ Pod::Spec.new do |s|
     'Core/**/*.xcassets'
   ]
   s.public_header_files = 'Core/**/*.h'
+  s.requires_arc = true
 
   # 依赖第三方
   s.dependency 'MJRefresh', '~> 3.7.9'
