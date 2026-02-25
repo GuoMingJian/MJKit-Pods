@@ -6,11 +6,10 @@
 
 import UIKit
 import CoreLocation
-import HandyJSON
 
 // MARK: - 获取数据格式
 public extension MJLocationManager {
-    struct MJLocationInfo: HandyJSON {
+    struct MJLocationInfo: Codable {
         public var longitude: Double = -1
         public var latitude: Double = -1
         public var address: String = ""

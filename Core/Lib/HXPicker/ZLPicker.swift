@@ -7,10 +7,9 @@
 import UIKit
 import Photos
 import ZLPhotoBrowser
-import HandyJSON
 
 /// 系统文件数据
-public struct MJSystemFileInfo: HandyJSON {
+public struct MJSystemFileInfo: Codable {
     var id: Int = 0
     var url: String = ""
     var fileType: String = ""
