@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Core/**/*.h'
   
   # 依赖第三方
-  s.dependency 'HandyJSON', '~> 5.0.4'
+  s.dependency 'HandyJSON', '~> 5.0.2'
   s.dependency 'MJRefresh', '~> 3.7.9'
   s.dependency 'EmptyDataSet-Swift', '~> 5.0.0'
   s.dependency 'SnapKit', '~> 5.7.1'
