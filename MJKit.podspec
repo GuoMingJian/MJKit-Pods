@@ -1,13 +1,13 @@
 Pod::Spec.new do |s|
   s.name            = 'MJKit'
   s.version         = '1.0.0'
-  s.summary         = '基础组件'
+  s.summary         = 'iOS开发基础组件'
   s.description     = '封装了<扩展、工具函数、UI组件>等'
   
   # 对于纯本地库，这些可以省略或简化
-  s.license         = { :type => 'MIT' }
+  s.license         = { :type => 'MIT', :file => 'LICENSE' }
   s.author          = { '郭明健' => '1339601489@qq.com' }
-  s.homepage        = 'https://github.com/郭明健/MJKit'
+  s.homepage        = 'https://github.com/GuoMingJian/MJKit-Pods'
   # 本地库不需要真实的 git 源
   s.source          = { :git => '' }
   
@@ -30,14 +30,7 @@ Pod::Spec.new do |s|
   s.dependency 'ZLPhotoBrowser', '~> 4.5.8'
   s.dependency 'SDWebImage', '~> 5.21.1'
   s.dependency 'AliyunOSSiOS', '~> 2.11.1'
-  # Loading动画
   s.dependency 'NVActivityIndicatorView', '~> 5.2.0'
-  # 钥匙串(UUID)
   s.dependency 'KeychainAccess', '~> 4.2.2'
-  # 音频播放
   s.dependency 'MobileVLCKit', '~> 3.6.0'
 end
-
-## 本地库 （MJKit跟Podfile文件同级）
-#pod 'MJKit', :path => './MJKit'
-#
