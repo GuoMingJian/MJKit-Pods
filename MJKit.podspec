@@ -36,5 +36,5 @@ Pod::Spec.new do |s|
   s.dependency 'AliyunOSSiOS', '~> 2.11.1'
   s.dependency 'NVActivityIndicatorView', '~> 5.2.0'
   s.dependency 'KeychainAccess', '~> 4.2.2'
-  s.dependency 'MobileVLCKit', '~> 3.6.0'
+  #s.dependency 'MobileVLCKit', '~> 3.6.0'
 end
