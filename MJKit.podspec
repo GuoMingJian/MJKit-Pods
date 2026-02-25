@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
     :git => 'https://github.com/GuoMingJian/MJKit-Pods.git' , 
     :tag => s.version.to_s 
   }
-  s.ios.deployment_target = '12.0'
+  s.ios.deployment_target = '14.0'
   #s.platform        = :ios, '14.0'
   s.swift_version   = '5.0'
   s.source_files    = 'Core/**/*.{h,m,swift}'
@@ -19,6 +19,16 @@ Pod::Spec.new do |s|
   'Core/**/*.xcassets'
   ]
   s.public_header_files = 'Core/**/*.h'
+
+  # 解决 libarclite 错误的关键配置
+  s.pod_target_xcconfig = {
+    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'
+  }
+  s.user_target_xcconfig = {
+    'IPHONEOS_DEPLOYMENT_TARGET' => '14.0',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'
+  }
   
   # 依赖第三方
   s.dependency 'MJRefresh', '~> 3.7.9'
