@@ -9,8 +9,9 @@ Pod::Spec.new do |s|
   s.source          = { 
     :git => 'https://github.com/GuoMingJian/MJKit-Pods.git' , 
     :tag => s.version.to_s 
-  } 
-  s.platform        = :ios, '14.0'
+  }
+  s.ios.deployment_target = '12.0'
+  #s.platform        = :ios, '14.0'
   s.swift_version   = '5.0'
   s.source_files    = 'Core/**/*.{h,m,swift}'
   s.resources       = [
