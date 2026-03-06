@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name            = 'MJKit'
-  s.version         = '1.0.0'
+  s.version         = '1.0.1'
   s.summary         = 'iOS开发基础组件'
   s.description     = '封装了扩展、工具函数、UI组件等'
 
@@ -30,10 +30,10 @@ Pod::Spec.new do |s|
   s.dependency 'HXPhotoPicker', '~> 5.0.5'
   s.dependency 'ZLPhotoBrowser', '~> 4.5.8'
   s.dependency 'SDWebImage', '~> 5.21.1'
-  s.dependency 'AliyunOSSiOS', '~> 2.11.2'
   s.dependency 'NVActivityIndicatorView', '~> 5.2.0'
   s.dependency 'KeychainAccess', '~> 4.2.2'
-  s.dependency 'MobileVLCKit', '~> 3.6.0'
+  #s.dependency 'AliyunOSSiOS', '~> 2.11.2'
+  #s.dependency 'MobileVLCKit', '~> 3.6.0'
 
 end
 
