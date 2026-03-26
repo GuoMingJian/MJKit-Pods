@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name            = 'MJKit'
-  s.version         = '1.0.1'
+  s.version         = '1.0.2'
   s.summary         = 'iOS开发基础组件'
   s.description     = '封装了扩展、工具函数、UI组件等'
 

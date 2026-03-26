@@ -3,13 +3,13 @@ iOS Developer Tools
 
 /*
  # 1. 修改代码
- # 2. 更新版本号（例如 1.0.1）
+ # 2. 更新版本号（例如 1.0.2）
  # 3. 打 tag
- git tag 1.0.1
+ git tag 1.0.2
  git push --tags
 
  # 4. 修改 podspec 中的版本号
- # s.version = "1.0.1"
+ # s.version = "1.0.2"
  
  pod trunk register 1339601489@qq.com "郭明健" --description='MacBook Pro for MJKit publishing' --verbose
  
