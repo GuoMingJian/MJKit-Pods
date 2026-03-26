@@ -18,18 +18,24 @@ public class MJUUID {
             uuid = try keychain.get(UUID_KEY) ?? ""
         }
         catch let error {
+#if DEBUG
             print("MJUUID error1 ====> \(error)")
+#endif
         }
-        print("uuid ====> 拉取的设备：\(uuid)")
         if uuid.isEmpty {
-            uuid = UUID().uuidString
+            let newId = UUID().uuidString
             do {
-                try keychain.set(uuid, key: UUID_KEY)
-                print("MJUUID new ====> \(uuid)")
+                try keychain.set(newId, key: UUID_KEY)
+                uuid = newId
+#if DEBUG
+                print("MJUUID new ====> \(newId)")
+#endif
             }
             catch let error {
+#if DEBUG
                 print("MJUUID error2 ====> \(error)")
-                uuid = ""
+#endif
+                uuid = newId
             }
         }
         return uuid

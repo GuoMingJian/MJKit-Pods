@@ -215,9 +215,7 @@ public struct MJAuthorization {
                 }
             case .disable:
                 DispatchQueue.main.async {
-                    if failure != nil {
-                        failure!()
-                    }
+                    failure?()
                 }
             default:
                 break
@@ -245,9 +243,7 @@ public struct MJAuthorization {
                 }
             case .disable:
                 DispatchQueue.main.async {
-                    if failure != nil {
-                        failure!()
-                    }
+                    failure?()
                 }
             default:
                 break
@@ -258,40 +254,42 @@ public struct MJAuthorization {
     /// 展示授权弹框
     /// - Parameter type: 授权类型
     public static func showDeniedAlert(type: MJAuthorizationType) {
-        let appName = (Bundle.main.infoDictionary!["CFBundleDisplayName"] ?? Bundle.main.infoDictionary!["CFBundleName"]) as! String
+        let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
+            ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+            ?? "App"
         var title = ""
         var description = ""
         switch type {
         case .photoAddOnly:
             title = "PhotoTitle_add"
-            description = Bundle.main.infoDictionary!["NSPhotoLibraryAddUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSPhotoLibraryAddUsageDescription") as? String ?? ""
         case .photoReadWrite:
             title = "PhotoTitle_all"
-            description = Bundle.main.infoDictionary!["NSPhotoLibraryUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSPhotoLibraryUsageDescription") as? String ?? ""
         case .camera:
             title = "CameraTitle"
-            description = Bundle.main.infoDictionary!["NSCameraUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSCameraUsageDescription") as? String ?? ""
         case .mic:
             title = "MicTitle"
-            description = Bundle.main.infoDictionary!["NSMicrophoneUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSMicrophoneUsageDescription") as? String ?? ""
         case .contact:
             title = "ContactTitle"
-            description = Bundle.main.infoDictionary!["NSContactsUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSContactsUsageDescription") as? String ?? ""
         case .event:
             title = "EventTitle"
-            description = Bundle.main.infoDictionary!["NSCalendarsUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSCalendarsUsageDescription") as? String ?? ""
         case .reminder:
             title = "ReminderTitle"
-            description = Bundle.main.infoDictionary!["NSRemindersUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSRemindersUsageDescription") as? String ?? ""
         case .locationWhenInUse:
             title = "LocationTitle"
-            description = Bundle.main.infoDictionary!["NSLocationWhenInUseUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") as? String ?? ""
         case .locationAlways:
             title = "LocationTitle"
-            description = Bundle.main.infoDictionary!["NSLocationAlwaysUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSLocationAlwaysUsageDescription") as? String ?? ""
         case .bluetooth:
             title = "BleTitle"
-            description = Bundle.main.infoDictionary!["NSBluetoothAlwaysUsageDescription"] as! String
+            description = Bundle.main.object(forInfoDictionaryKey: "NSBluetoothAlwaysUsageDescription") as? String ?? ""
         }
         let alert = UIAlertController(title: String(format: title.mj_localizedAuth(), appName) , message: description, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "PermissionGo".mj_localizedAuth(), style: .default, handler: { _ in
@@ -317,21 +315,13 @@ public struct MJAuthorization {
         }
         
         DispatchQueue.main.async {
-            if #available(iOS 10.0, *) {
-                UIApplication.shared.open(settingsUrl, options: [:], completionHandler: nil)
-            } else {
-                UIApplication.shared.openURL(settingsUrl)
-            }
+            UIApplication.shared.open(settingsUrl, options: [:], completionHandler: nil)
         }
     }
     
     // MARK: - UIView
     private static func currentWindow() -> UIWindow? {
-        if #available(iOS 13.0, *) {
-            return UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).first?.windows.first
-        } else {
-            return UIApplication.shared.keyWindow
-        }
+        UIView.getKeyWindow()
     }
     
     private static func currentViewController() -> UIViewController? {
@@ -342,18 +332,16 @@ public struct MJAuthorization {
     }
     
     private static func currentViewControllerFrom(_ root: UIViewController) -> UIViewController {
-        let currentViewController: UIViewController
-        if root.presentedViewController != nil {
-            return self.currentViewControllerFrom(root.presentedViewController!)
+        if let presented = root.presentedViewController {
+            return currentViewControllerFrom(presented)
         }
-        if root.isKind(of: UITabBarController.classForCoder()) {
-            currentViewController = self.currentViewControllerFrom((root as! UITabBarController).selectedViewController!)
-        } else if root.isKind(of: UINavigationController.classForCoder()) {
-            currentViewController = self.currentViewControllerFrom((root as! UINavigationController).visibleViewController!)
-        } else {
-            currentViewController = root
+        if let tab = root as? UITabBarController, let selected = tab.selectedViewController {
+            return currentViewControllerFrom(selected)
         }
-        return currentViewController
+        if let nav = root as? UINavigationController, let visible = nav.visibleViewController {
+            return currentViewControllerFrom(visible)
+        }
+        return root
     }
 }
 

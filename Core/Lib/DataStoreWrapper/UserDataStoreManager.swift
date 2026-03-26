@@ -49,14 +49,16 @@ public class UserDataStoreManager {
     }
     
     public func clearAllUserDefaults() {
+        let prefix = "\(userKey)_"
         let allKeys = UserDefaults.standard.dictionaryRepresentation().keys
-        for userKey in allKeys where userKey.hasPrefix("\(userKey)_") {
-            UserDefaults.standard.removeObject(forKey: userKey)
+        for key in allKeys where key.hasPrefix(prefix) {
+            UserDefaults.standard.removeObject(forKey: key)
         }
     }
     
     private func getUserDirectory() -> URL {
-        let baseDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let baseDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
         let userDirectory = baseDirectory.appendingPathComponent(userKey)
         if !FileManager.default.fileExists(atPath: userDirectory.path) {
             try? FileManager.default.createDirectory(at: userDirectory, withIntermediateDirectories: true)

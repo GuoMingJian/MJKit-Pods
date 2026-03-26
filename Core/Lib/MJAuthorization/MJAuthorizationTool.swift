@@ -1,5 +1,5 @@
-
 import UIKit
+import CoreLocation
 import Photos
 import AVFoundation
 import Contacts
@@ -55,28 +55,28 @@ public class MJAuthorizationTool: NSObject, CLLocationManagerDelegate, CBCentral
         } else {
             status = PHPhotoLibrary.authorizationStatus()
         }
-        return MJAuthorizationStatus.init(rawValue: status.rawValue)!
+        return MJAuthorizationStatus(rawValue: status.rawValue) ?? .denied
     }
     
     /// 获取相机权限状态
     /// - Returns: 权限状态
     public static func cameraAuthorizationStatus() -> MJAuthorizationStatus {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
-        return MJAuthorizationStatus.init(rawValue: status.rawValue)!
+        return MJAuthorizationStatus(rawValue: status.rawValue) ?? .denied
     }
     
     /// 获取麦克风权限状态
     /// - Returns: 权限状态
     public static func micAuthorizationStatus() -> MJAuthorizationStatus {
         let status = AVCaptureDevice.authorizationStatus(for: .audio)
-        return MJAuthorizationStatus.init(rawValue: status.rawValue)!
+        return MJAuthorizationStatus(rawValue: status.rawValue) ?? .denied
     }
     
     /// 获取通讯录权限状态
     /// - Returns: 权限状态
     public static func contactAuthorizationStatus() -> MJAuthorizationStatus {
         let status = CNContactStore.authorizationStatus(for: .contacts)
-        return MJAuthorizationStatus.init(rawValue: status.rawValue)!
+        return MJAuthorizationStatus(rawValue: status.rawValue) ?? .denied
     }
     
     /// 获取日历权限状态
@@ -84,7 +84,7 @@ public class MJAuthorizationTool: NSObject, CLLocationManagerDelegate, CBCentral
     /// - Returns: 权限状态
     public static func calendarAuthorizationStatus(type: EKEntityType) -> MJAuthorizationStatus {
         let status = EKEventStore.authorizationStatus(for: type)
-        return MJAuthorizationStatus.init(rawValue: status.rawValue)!
+        return MJAuthorizationStatus(rawValue: status.rawValue) ?? .denied
     }
     
     /// 获取定位权限状态
@@ -149,7 +149,7 @@ public class MJAuthorizationTool: NSObject, CLLocationManagerDelegate, CBCentral
     public static func requestPhotoAuthorization(level: KPhotoAccessLevel = .readWrite, completionHandler: @escaping (Bool) -> Void) {
         if #available(iOS 14, *) {
             PHPhotoLibrary.requestAuthorization(for: level == .addOnly ? .addOnly : .readWrite) { status in
-                completionHandler(status == .authorized)
+                completionHandler(status == .authorized || status == .limited)
             }
         } else {
             PHPhotoLibrary.requestAuthorization { status in

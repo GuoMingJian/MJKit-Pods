@@ -66,6 +66,10 @@ public class ZLPicker {
                 let picker = ZLPhotoPreviewSheet()
                 //
                 picker.selectImageBlock = { results, isOriginal in
+                    if results.isEmpty {
+                        compeleted([])
+                        return
+                    }
                     var fileDataList: [MJSystemFileInfo] = []
                     for (_, result) in results.enumerated() {
                         ZLPicker.shared.getPhotoBrowserData(result: result) { data in
@@ -266,8 +270,8 @@ public extension ZLPicker {
             fileData.fileName = String.randomString(length: 4) + "_" + dateStr + fileData.fileType
             if let data = result.image.pngData() {
                 fileData.data = data
-                compeleted(fileData)
             }
+            compeleted(fileData)
         }
     }
     
@@ -282,6 +286,8 @@ public extension ZLPicker {
                 let videoURL = urlAsset.url
                 let fileData = ZLPicker.shared.systemUrlToData(url: videoURL, isNeedAccessingSecurity: false)
                 compeleted(fileData)
+            } else {
+                compeleted(MJSystemFileInfo())
             }
         }
     }

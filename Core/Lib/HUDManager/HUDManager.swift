@@ -78,7 +78,7 @@ public class HUDManager {
 extension HUDManager {
     public static func showToast(_ message: String, in view: UIView? = nil, duration: TimeInterval = Style.toastDuration) {
         guard !message.isEmpty else { return }
-        let targetView = view ?? UIApplication.shared.windows.first { $0.isKeyWindow }
+        let targetView = view ?? UIView.getKeyWindow()
         guard let container = targetView else { return }
         
         removeHUDSubviews(from: container, tag: Style.toastTag)
@@ -103,7 +103,7 @@ extension HUDManager {
     }
     
     public static func showLoading(_ message: String = "", in view: UIView? = nil) {
-        let targetView = view ?? UIApplication.shared.windows.first { $0.isKeyWindow }
+        let targetView = view ?? UIView.getKeyWindow()
         guard let container = targetView else { return }
         
         dismiss(from: container)
@@ -128,7 +128,7 @@ extension HUDManager {
     }
     
     public static func dismiss(from view: UIView? = nil) {
-        let container = view ?? UIApplication.shared.windows.first { $0.isKeyWindow }
+        let container = view ?? UIView.getKeyWindow()
         guard let validView = container else { return }
         removeHUDSubviews(from: validView, tag: Style.loadingTag)
         removeHUDSubviews(from: validView, tag: Style.backgroundTag)
