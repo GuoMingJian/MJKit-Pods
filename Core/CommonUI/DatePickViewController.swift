@@ -160,11 +160,11 @@ public class DatePickViewController: UIViewController {
             let calendar = Calendar.current
             let currentDate = Date()
             
-            let minDate = calendar.date(byAdding: .year, value: -65, to: currentDate)!
-            let maxDate = calendar.date(byAdding: .year, value: -18, to: currentDate)!
-            
-            self.minimumDate = minDate
-            self.maximumDate = maxDate
+            if let minDate = calendar.date(byAdding: .year, value: -65, to: currentDate),
+               let maxDate = calendar.date(byAdding: .year, value: -18, to: currentDate) {
+                self.minimumDate = minDate
+                self.maximumDate = maxDate
+            }
         }
         
         datePicker.minimumDate = minimumDate
@@ -281,8 +281,12 @@ public extension DatePickViewController {
         let calendar = Calendar.current
         let currentDate = Date()
         
-        let defaultMinDate = minimumDate ?? calendar.date(byAdding: .year, value: -65, to: currentDate)!
-        let defaultMaxDate = maximumDate ?? calendar.date(byAdding: .year, value: -18, to: currentDate)!
+        let defaultMinDate = minimumDate
+            ?? calendar.date(byAdding: .year, value: -65, to: currentDate)
+            ?? currentDate
+        let defaultMaxDate = maximumDate
+            ?? calendar.date(byAdding: .year, value: -18, to: currentDate)
+            ?? currentDate
         let defaultSelectedDate = selectedDate ?? defaultMaxDate
         
         datePickerVC.configure(selectedDate: defaultSelectedDate,

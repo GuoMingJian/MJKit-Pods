@@ -271,14 +271,9 @@ extension LimitTextView: UITextViewDelegate {
     }
     
     public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        // 允许删除字符
-        if text.isEmpty {
-            return true
-        }
-        
-        // 检查是否超过最大输入限制
         let currentText = textView.text ?? ""
-        let newLength = currentText.count + text.count - range.length
-        return newLength <= maxInputCount
+        guard let textRange = Range(range, in: currentText) else { return true }
+        let newText = currentText.replacingCharacters(in: textRange, with: text)
+        return newText.count <= maxInputCount
     }
 }

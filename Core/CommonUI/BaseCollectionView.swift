@@ -134,43 +134,28 @@ public class BaseCollectionView: UICollectionView {
     
     // MARK: - actions
     @objc private func mjHeaderRefresh() {
-        if headerRefreshBlock != nil {
-            headerRefreshBlock!()
-        }
+        headerRefreshBlock?()
     }
     
     @objc private func mjFooterRefresh() {
-        if footerRefreshBlock != nil {
-            footerRefreshBlock!()
-        }
+        footerRefreshBlock?()
     }
 }
 
 extension BaseCollectionView: EmptyDataSetSource, EmptyDataSetDelegate {
     public func image(forEmptyDataSet scrollView: UIScrollView) -> UIImage? {
         if isRequested {
-            var resultImage: UIImage = "mj_noData".mj_Image()
-            if let image = noDataImage {
-                resultImage = image
-            }
-            return resultImage
+            return noDataImage ?? "mj_noData".mj_Image()
         }
         return nil
     }
     
     public func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
         if isRequested {
-            var string: String = "no_data".mj_Localized()
-            if let noDataString = noDataTitle {
-                string = noDataString
-            }
+            let string = noDataTitle ?? "no_data".mj_Localized()
             let font = UIFont.systemFont(ofSize: 14, weight: .regular)
-            var textColor: UIColor = UIColor.hexColor(color: "#5F5B78")
-            if let color = noDataTextColor {
-                textColor = color
-            }
-            let attributedString = NSAttributedString(string: string, attributes: [ NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: textColor])
-            return attributedString
+            let textColor = noDataTextColor ?? UIColor.hexColor(color: "#5F5B78")
+            return NSAttributedString(string: string, attributes: [.font: font, .foregroundColor: textColor])
         }
         return nil
     }

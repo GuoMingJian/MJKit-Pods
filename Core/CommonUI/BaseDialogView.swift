@@ -1,11 +1,12 @@
 //
 //  BaseDialogView.swift
-//  NeonMe
+//  MJKit
 //
 //  Created by 郭明健 on 2025/10/23.
 //
 
 import UIKit
+import SnapKit
 
 /*
  var config = BaseDialogView.Configuration()
@@ -212,10 +213,7 @@ public class BaseDialogView: UIView {
     }
     
     private func updateContainerConstraints() {
-        // 移除旧的约束
-        dialogContainerView.snp.removeConstraints()
-        
-        dialogContainerView.snp.makeConstraints { make in
+        dialogContainerView.snp.remakeConstraints { make in
             make.center.equalToSuperview()
             make.leading.equalToSuperview().offset(config.dialogLeading)
             make.trailing.equalToSuperview().offset(-config.dialogLeading)
@@ -433,11 +431,6 @@ public class BaseDialogView: UIView {
         // 更新UI
         updateUI()
         setupLayout(for: type)
-        
-        // 布局完成后显示动画
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            self.showDialog()
-        }
     }
     
     private func updateUI() {

@@ -129,7 +129,7 @@ public extension UIImageView {
 public extension MJLoadingView {
     /// 显示 Loading页面
     @objc static func show() {
-        guard let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+        guard let keyWindow = UIView.getKeyWindow() else { return }
         
         // 检查是否已经存在
         if isExist(in: keyWindow) {
@@ -146,7 +146,7 @@ public extension MJLoadingView {
     
     /// 隐藏 Loading页面
     @objc static func hide() {
-        guard let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+        guard let keyWindow = UIView.getKeyWindow() else { return }
         
         if let loadingView = keyWindow.viewWithTag(7777) as? MJLoadingView {
             loadingView.hideLoading()
@@ -155,7 +155,7 @@ public extension MJLoadingView {
     
     /// app 从后台进入前台时，让Loading旋转起来
     @objc static func checkLoading() {
-        guard let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+        guard let keyWindow = UIView.getKeyWindow() else { return }
         
         if let loadingView = keyWindow.viewWithTag(7777) as? MJLoadingView {
             loadingView.showLoading()
@@ -188,7 +188,7 @@ public extension MJLoadingView {
     @objc static func showStatus(iconName: String,
                                  text: String,
                                  dismissTime: TimeInterval = 2) {
-        guard let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+        guard let keyWindow = UIView.getKeyWindow() else { return }
         
         // 检查是否已经存在状态视图
         if let existingStatusView = keyWindow.viewWithTag(8888) as? MJLoadingView {
@@ -209,7 +209,7 @@ public extension MJLoadingView {
     
     /// 隐藏状态
     @objc static func hideStatus() {
-        guard let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+        guard let keyWindow = UIView.getKeyWindow() else { return }
         
         if let statusView = keyWindow.viewWithTag(8888) as? MJLoadingView {
             statusView.hideLoading()
@@ -225,7 +225,7 @@ public extension MJLoadingView {
                                      color: UIColor = UIColor.black) {
         hiddenDotLoading()
         
-        guard let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+        guard let keyWindow = UIView.getKeyWindow() else { return }
         
         let activityIndicatorView = NVActivityIndicatorView(frame: .zero,
                                                             type: .ballSpinFadeLoader,
@@ -246,7 +246,7 @@ public extension MJLoadingView {
     }
     
     @objc static func hiddenDotLoading() {
-        guard let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+        guard let keyWindow = UIView.getKeyWindow() else { return }
         
         if let activityView = keyWindow.viewWithTag(9999) as? NVActivityIndicatorView {
             activityView.stopAnimating()

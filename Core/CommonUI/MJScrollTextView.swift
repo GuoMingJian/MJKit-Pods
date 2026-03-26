@@ -128,7 +128,7 @@ public class MJScrollTextView: UIView {
             //
             let btn = UIButton(frame: self.bounds)
             btn.tag = index + kBtnTag
-            btn.addTarget(self, action: #selector(onClick), for: .touchUpInside)
+            btn.addTarget(self, action: #selector(onClick(button:)), for: .touchUpInside)
             self.addSubview(btn)
             //
             if config.titles.count > 1 {
@@ -179,8 +179,6 @@ public class MJScrollTextView: UIView {
         newLbl.numberOfLines = 0
         self.addSubview(newLbl)
         //
-        var rect = newLbl.frame
-        rect.origin.x = rect.origin.x - config.leadingOffset
         let newBtn = UIButton(frame: self.bounds)
         newBtn.tag = index + kBtnTag
         newBtn.addTarget(self, action: #selector(onClick(button:)), for: .touchUpInside)
@@ -188,18 +186,19 @@ public class MJScrollTextView: UIView {
         //
         oldLbl.alpha = 1
         newLbl.alpha = 0
-        UIView.animate(withDuration: 0.3, animations: { [self] in
+        UIView.animate(withDuration: 0.3, animations: { [weak self] in
+            guard let self = self else { return }
             oldLbl.alpha = 0
             newLbl.alpha = 1
             if self.config.scrollDirection == .vertical {
-                oldLbl.frame = CGRect(x: config.leadingOffset, y: -self.frame.size.height, width: self.frame.size.width, height: self.frame.size.height)
-                newLbl.frame = CGRect(x: config.leadingOffset, y: 0, width: self.frame.size.width, height: self.frame.size.height)
+                oldLbl.frame = CGRect(x: self.config.leadingOffset, y: -self.frame.size.height, width: self.frame.size.width, height: self.frame.size.height)
+                newLbl.frame = CGRect(x: self.config.leadingOffset, y: 0, width: self.frame.size.width, height: self.frame.size.height)
             } else {
-                oldLbl.frame = CGRect(x: -(config.leadingOffset + self.frame.size.width), y: 0, width: self.frame.size.width, height: self.frame.size.height)
-                newLbl.frame = CGRect(x: config.leadingOffset, y: 0, width: self.frame.size.width, height: self.frame.size.height)
+                oldLbl.frame = CGRect(x: -(self.config.leadingOffset + self.frame.size.width), y: 0, width: self.frame.size.width, height: self.frame.size.height)
+                newLbl.frame = CGRect(x: self.config.leadingOffset, y: 0, width: self.frame.size.width, height: self.frame.size.height)
             }
             newBtn.frame = newLbl.frame
-        }, completion: {(finished) -> Void in
+        }, completion: { _ in
             oldLbl.removeFromSuperview()
             oldBtn.removeFromSuperview()
         })

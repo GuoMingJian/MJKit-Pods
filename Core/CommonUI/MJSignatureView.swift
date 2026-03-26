@@ -96,7 +96,9 @@ public class MJSignatureView: UIView {
             self.setNeedsDisplay()
         } else {
             // 保存当前路径到数组
-            paths.append(path.copy() as! UIBezierPath)
+            if let copied = path.copy() as? UIBezierPath {
+                paths.append(copied)
+            }
             
             // 创建新路径并保持相同的配置
             self.path = UIBezierPath()
@@ -125,13 +127,14 @@ public class MJSignatureView: UIView {
         self.setNeedsDisplay() // 重新绘制
     }
     
-    /// 将签名保存为UIImage
+    /// 将签名保存为 UIImage（bounds 无效时返回空图）
     public func getSignature() -> UIImage {
-        UIGraphicsBeginImageContext(CGSize(width: self.bounds.size.width, height: self.bounds.size.height))
-        self.layer.render(in: UIGraphicsGetCurrentContext()!)
-        let signature: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        return signature
+        let size = bounds.size
+        guard size.width > 0, size.height > 0 else { return UIImage() }
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { ctx in
+            layer.render(in: ctx.cgContext)
+        }
     }
     
     /// 检查是否有签名

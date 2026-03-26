@@ -128,11 +128,6 @@ open class BasePopController: UIViewController {
         guard !isDismissing else { return }
         isDismissing = true
         
-        guard isBackgroundTapEnabled else {
-            onBackgroundTap?()
-            return
-        }
-        
         UIView.animate(
             withDuration: 0.25,
             delay: 0,
@@ -142,8 +137,13 @@ open class BasePopController: UIViewController {
                 self.backgroundView.alpha = 0
                 self.containerView.transform = CGAffineTransform(translationX: 0, y: self.containerHeight)
             },
-            completion: { _ in
+            completion: { [weak self] _ in
+                guard let self = self else {
+                    completion?()
+                    return
+                }
                 self.dismiss(animated: false) {
+                    self.isDismissing = false
                     completion?()
                 }
             }
@@ -151,6 +151,8 @@ open class BasePopController: UIViewController {
     }
     
     @objc private func backgroundTapped() {
+        onBackgroundTap?()
+        guard isBackgroundTapEnabled else { return }
         dismissWithAnimation()
     }
     

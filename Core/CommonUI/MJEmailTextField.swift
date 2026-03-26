@@ -100,7 +100,6 @@ public class MJEmailTextField: UITextField {
         tableView.bounces = true
         tableView.separatorStyle = .none
         tableView.backgroundColor = UIColor.white
-        // 设置分隔符样式
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = .lightGray.withAlphaComponent(0.3)
         //
@@ -214,16 +213,12 @@ public class MJEmailTextField: UITextField {
         if inputText.contains("@") {
             let prefix: String = inputText.components(separatedBy: "@").first ?? ""
             let suffix: String = "@" + (inputText.components(separatedBy: "@").last ?? "")
-            for (_, item) in configuration.emailSuffixList.enumerated() {
-                if item.contains(suffix) {
-                    let value = prefix + item
-                    tempList.append(value)
-                }
+            for item in configuration.emailSuffixList where item.contains(suffix) {
+                tempList.append(prefix + item)
             }
         } else {
-            for (_, item) in configuration.emailSuffixList.enumerated() {
-                let value = "\(inputText)\(item)"
-                tempList.append(value)
+            for item in configuration.emailSuffixList {
+                tempList.append("\(inputText)\(item)")
             }
         }
         return tempList
@@ -251,7 +246,7 @@ public class MJEmailTextField: UITextField {
                     popViewWidth = maxShowWidth
                     // 从开始点计算，宽度已经超出屏幕了，需要更改展示cell。不然导致邮箱类型显示不全
                     var newList: [String] = []
-                    for (_, item) in filterEmailList.enumerated() {
+                    for item in filterEmailList {
                         let prefix: String = item.components(separatedBy: "@").first ?? ""
                         let suffix: String = "@" + (item.components(separatedBy: "@").last ?? "")
                         if prefix.count >= configuration.maxOmitCount {

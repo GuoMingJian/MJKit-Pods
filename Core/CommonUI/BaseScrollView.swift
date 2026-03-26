@@ -96,14 +96,10 @@ public class BaseScrollView: UIScrollView {
     
     // MARK: - actions
     @objc private func mjHeaderRefresh() {
-        if headerRefreshBlock != nil {
-            headerRefreshBlock!()
-        }
+        headerRefreshBlock?()
     }
     
     @objc private func mjFooterRefresh() {
-        if footerRefreshBlock != nil {
-            footerRefreshBlock!()
-        }
+        footerRefreshBlock?()
     }
 }

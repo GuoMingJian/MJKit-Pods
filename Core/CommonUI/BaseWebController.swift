@@ -169,9 +169,10 @@ public class BaseWebViewController: UIViewController {
         progressView.setProgress(Float(progress), animated: true)
         
         if progress >= 1.0 {
-            UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: {
-                self.progressView.alpha = 0
-            }) { _ in
+            UIView.animate(withDuration: 0.3, delay: 0.3, options: [], animations: { [weak self] in
+                self?.progressView.alpha = 0
+            }) { [weak self] _ in
+                guard let self = self else { return }
                 self.progressView.isHidden = true
                 self.progressView.progress = 0
                 self.progressView.alpha = 1

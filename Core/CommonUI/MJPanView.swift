@@ -82,7 +82,7 @@ extension MJPanView {
         
         // stop_y是tableview的偏移量，当tableview的偏移量大于0时则不去处理视图滑动的事件
         if self.stop_y > 0 {
-            // 将视频偏移量重置为0
+            // 将手势偏移量重置为 0
             pan.setTranslation(CGPoint(x: 0, y: 0), in: self)
             return
         }
