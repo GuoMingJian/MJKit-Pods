@@ -73,6 +73,11 @@ public class HUDManager {
             }
         }
     }
+    
+    /// 子视图居中须用容器自身 `bounds` 的中心（`container.center` 是容器在父视图上的位置，坐标系错误）
+    private static func hudCenter(in container: UIView) -> CGPoint {
+        CGPoint(x: container.bounds.midX, y: container.bounds.midY)
+    }
 }
 
 extension HUDManager {
@@ -89,7 +94,7 @@ extension HUDManager {
         }
         
         container.addSubview(toast)
-        toast.center = container.center
+        toast.center = hudCenter(in: container)
         
         UIView.animate(withDuration: Style.animationDuration) { toast.alpha = 1 }
         
@@ -111,6 +116,7 @@ extension HUDManager {
         let overlay = UIView(frame: container.bounds).then {
             $0.backgroundColor = UIColor.black.withAlphaComponent(0.05)
             $0.tag = Style.backgroundTag
+            $0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         }
         container.addSubview(overlay)
         
@@ -120,7 +126,7 @@ extension HUDManager {
         }
         
         container.addSubview(loadingView)
-        loadingView.center = container.center
+        loadingView.center = hudCenter(in: container)
         
         UIView.animate(withDuration: Style.animationDuration) {
             loadingView.alpha = 1
