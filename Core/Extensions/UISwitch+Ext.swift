@@ -15,6 +15,7 @@ public extension UISwitch {
     
     func setHandle(event: UIControl.Event = .touchUpInside,
                    callBlock: ((_ isOn: Bool) -> Void)? = nil) {
+        self.removeTarget(self, action: #selector(switchAction), for: event)
         self.mjCallBack = { isOn in
             if let block = callBlock, let isOn = isOn {
                 block(isOn)

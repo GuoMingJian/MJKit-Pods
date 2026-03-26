@@ -22,7 +22,8 @@ public extension UILabel {
         let color: UIColor = self.textColor ?? UIColor.lightGray
         //
         let attributeString: NSMutableAttributedString = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.font: font])
-        let rang: NSRange = text.range(of: deleteString)
+        let rang = text.nsRange(of: deleteString)
+        guard rang.location != NSNotFound else { return }
         
         attributeString.addAttributes([NSAttributedString.Key.baselineOffset : 0,
                                        NSAttributedString.Key.strikethroughStyle: 1.5,

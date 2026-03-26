@@ -21,15 +21,16 @@ public class MJRuntime: NSObject {
     public static func ivars(_ type: AnyClass) -> [String] {
         var listName = [String]()
         var count: UInt32 = 0
-        let ivars = class_copyIvarList(type, &count)
+        guard let ivars = class_copyIvarList(type, &count) else {
+            return listName
+        }
+        defer { free(ivars) }
         for i in 0..<count {
-            let nameP = ivar_getName(ivars![Int(i)])!
+            let nameP = ivar_getName(ivars[Int(i)])!
             let name = String(cString: nameP)
             debugPrint("name=\(name)")
             listName.append(name)
         }
-        // 方法中有 copy, create,的都需要释放
-        free(ivars)
         return listName
     }
     

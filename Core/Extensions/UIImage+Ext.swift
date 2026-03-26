@@ -201,15 +201,16 @@ public extension UIImage {
     /// 图片旋转
     func rotate(radians: CGFloat) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(self.size, false, self.scale)
+        defer { UIGraphicsEndImageContext() }
         guard let context = UIGraphicsGetCurrentContext() else {
             return nil
         }
-        let degrees = radians.radiansToDegrees
-        context.rotate(by: degrees)
-        self.draw(in: CGRect(x: -self.size.width, y: -self.size.height, width: self.size.width, height: self.size.height))
-        let rotatedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return rotatedImage
+        // `CGContext.rotate(by:)` 使用弧度，勿再做度/弧度转换
+        context.translateBy(x: self.size.width / 2, y: self.size.height / 2)
+        context.rotate(by: radians)
+        context.translateBy(x: -self.size.width / 2, y: -self.size.height / 2)
+        self.draw(in: CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height))
+        return UIGraphicsGetImageFromCurrentImageContext()
     }
     
     // MARK: 图片镜像转换

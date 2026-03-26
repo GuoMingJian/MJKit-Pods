@@ -54,13 +54,13 @@ public extension UIView {
         }
         var dotWidth: CGFloat = 16
         let dotHeight: CGFloat = 16
-        let cornerRadius: CGFloat = dotWidth / 2.0
         if unreadCount > 9, unreadCount < 99 {
             dotWidth = 22
         }
         if unreadCount >= 99 {
             dotWidth = 30
         }
+        let cornerRadius: CGFloat = min(dotWidth, dotHeight) / 2.0
         self.layoutIfNeeded()
         self.layer.masksToBounds = false
         //

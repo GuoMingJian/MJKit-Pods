@@ -23,7 +23,10 @@ public extension String {
     // MARK: 获取字符串某个索引的字符（从前往后,从0开始算的）
     /// 获取字符串某个索引的字符（从前往后,从0开始算的）
     func getCharAdvance(index: Int) -> String {
-        assert(index < self.count, "字符串索引越界了！")
+        guard index >= 0, index < count else {
+            assertionFailure("字符串索引越界了！")
+            return ""
+        }
         let positionIndex = self.index(self.startIndex, offsetBy: index)
         let char = self[positionIndex]
         return String(char)
@@ -32,13 +35,17 @@ public extension String {
     // MARK: 获取字符串第一个字符
     /// 获取字符串第一个字符
     func getFirstChar() -> String {
+        guard !isEmpty else { return "" }
         return getCharAdvance(index: 0)
     }
     
     // MARK: 获取字符串某个索引的字符（从后往前）
     /// 获取字符串某个索引的字符（从后往前）
     func getCharReverse(index: Int) -> String {
-        assert(index < self.count, "字符串索引越界了！")
+        guard index >= 0, index < count else {
+            assertionFailure("字符串索引越界了！")
+            return ""
+        }
         // 在这里做了索引减1，因为endIndex获取的是 字符串最后一个字符的下一位
         let positionIndex = self.index(self.endIndex, offsetBy: -index - 1)
         let char = self[positionIndex]
@@ -79,11 +86,16 @@ public extension String {
         return subString(startIndex: 0, endIndex: endIndex)
     }
     
-    // MARK: 获取子字符串的范围NSRange
-    /// 获取子字符串的范围NSRange
+    // MARK: 获取子字符串的范围 NSRange（避免与 Swift 标准库 `range(of:)` 混淆）
+    /// 获取子字符串在 UTF-16 下的 `NSRange`（未找到时为 `NSNotFound`）
+    func nsRange(of subString: String) -> NSRange {
+        (self as NSString).range(of: subString)
+    }
+    
+    /// 获取子字符串的范围 NSRange
+    @available(*, deprecated, renamed: "nsRange(of:)")
     func range(of subString: String) -> NSRange {
-        let text = self as NSString
-        return text.range(of: subString)
+        nsRange(of: subString)
     }
 }
 
@@ -262,9 +274,12 @@ public extension String {
             print("无法解析出JSONString")
             return ""
         }
-        let data: NSData = try! JSONSerialization.data(withJSONObject: dictionary, options: []) as NSData
-        let JSONString: String = NSString(data: data as Data, encoding: String.Encoding.utf8.rawValue) as? String ?? ""
-        return JSONString
+        do {
+            let data = try JSONSerialization.data(withJSONObject: dictionary, options: [])
+            return String(data: data, encoding: .utf8) ?? ""
+        } catch {
+            return ""
+        }
     }
     
     // MARK: NSArray 转 JsonString
@@ -274,9 +289,12 @@ public extension String {
             print("无法解析出JSONString")
             return ""
         }
-        let data: NSData = try! JSONSerialization.data(withJSONObject: array, options: []) as NSData
-        let JSONString: NSString = NSString(data: data as Data, encoding: String.Encoding.utf8.rawValue) ?? ""
-        return JSONString as String
+        do {
+            let data = try JSONSerialization.data(withJSONObject: array, options: [])
+            return String(data: data, encoding: .utf8) ?? ""
+        } catch {
+            return ""
+        }
     }
     
     // MARK: 将数据转成json字符串
@@ -333,20 +351,19 @@ public extension String {
     }
     
     // MARK: NSArray 转 model
-    /// NSArray 转 model
+    /// 将 JSON 数组（如 `[{...},{...}]`）直接解码为 `Decodable`（例如 `[Item].self`）
     static func performTransToModelObject<T: Decodable>(type: T.Type,
                                                         array: NSArray) throws -> T? {
+        guard JSONSerialization.isValidJSONObject(array),
+              let data = try? JSONSerialization.data(withJSONObject: array, options: []) else {
+            return nil
+        }
         do {
-            let json = String.arrayToJson(array: array)
-            let dictionary: Dictionary<String, Any> = json.dictionary ?? [:]
-            if let jsonData: Data = String.dictionaryToData(jsonDic: dictionary) {
-                let obj = try JSONDecoder().decode(type.self, from: jsonData)
-                return obj
-            }
+            return try JSONDecoder().decode(type.self, from: data)
         } catch {
             print("Decode Error>>> \(error)")
+            return nil
         }
-        return nil
     }
     
     // MARK: plist文件 转 Array
@@ -401,33 +418,16 @@ public extension String {
 public extension String {
     // MARK: 随机字符串
     static func randomString(length: Int) -> String {
-        let letters: NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        let len = UInt32(letters.length)
-        
-        var randomString = ""
-        
-        for _ in 0 ..< length {
-            let rand = arc4random_uniform(len)
-            var nextChar = letters.character(at: Int(rand))
-            randomString += NSString(characters: &nextChar, length: 1) as String
-        }
-        
-        return randomString
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        guard length > 0 else { return "" }
+        return String((0..<length).map { _ in letters.randomElement()! })
     }
     
     // MARK: 随机字符串 (纯数字)
     static func randomIntString(length: Int) -> Int {
-        let letters : NSString = "0123456789"
-        let len = UInt32(letters.length)
-        
-        var randomString = ""
-        
-        for _ in 0 ..< length {
-            let rand = arc4random_uniform(len)
-            var nextChar = letters.character(at: Int(rand))
-            randomString += NSString(characters: &nextChar, length: 1) as String
-        }
-        
+        let letters = "0123456789"
+        guard length > 0 else { return 0 }
+        let randomString = String((0..<length).map { _ in letters.randomElement()! })
         return Int(randomString) ?? 0
     }
     

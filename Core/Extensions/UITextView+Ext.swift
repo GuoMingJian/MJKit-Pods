@@ -19,7 +19,9 @@ public extension UITextView {
     // MARK: 滑动到底部
     /// 滑动到底部
     func scrollToBottom() {
-        let range = NSRange(location: (self.text as NSString).length - 1, length: 1)
+        let nsLength = (self.text as NSString).length
+        guard nsLength > 0 else { return }
+        let range = NSRange(location: max(0, nsLength - 1), length: 1)
         self.scrollRangeToVisible(range)
     }
     
@@ -34,7 +36,7 @@ public extension UITextView {
     /// 插入图片
     func insertPicture(image: UIImage,
                        yOffset: CGFloat = -4) {
-        let mutableStr = NSMutableAttributedString(attributedString: self.attributedText)
+        let mutableStr = NSMutableAttributedString(attributedString: self.attributedText ?? NSAttributedString())
         
         // 创建图片附件
         let imgAttachment = NSTextAttachment(data: nil, ofType: nil)
@@ -67,7 +69,7 @@ public extension UITextView {
     // MARK: 插入文字
     /// 插入文字
     func insertString(_ text: String) {
-        let mutableStr = NSMutableAttributedString(attributedString: self.attributedText)
+        let mutableStr = NSMutableAttributedString(attributedString: self.attributedText ?? NSAttributedString())
         // 获得目前光标的位置
         let selectedRange = self.selectedRange
         // 插入文字

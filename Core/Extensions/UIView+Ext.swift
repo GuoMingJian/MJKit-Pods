@@ -28,25 +28,32 @@ public extension UIView {
         self.layer.masksToBounds = true
     }
     
-    /// 设置圆角
-    func setCornerRadius(conrners: UIRectCorner,
+    /// 设置圆角（指定角）
+    func setCornerRadius(corners: UIRectCorner,
                          radius: CGFloat) {
-        var tempCorners: CACornerMask = CACornerMask()
-        if conrners.contains(.topLeft) {
+        var tempCorners: CACornerMask = []
+        if corners.contains(.topLeft) {
             tempCorners.insert(.layerMinXMinYCorner)
         }
-        if conrners.contains(.topRight) {
+        if corners.contains(.topRight) {
             tempCorners.insert(.layerMaxXMinYCorner)
         }
-        if conrners.contains(.bottomLeft) {
+        if corners.contains(.bottomLeft) {
             tempCorners.insert(.layerMinXMaxYCorner)
         }
-        if conrners.contains(.bottomRight) {
+        if corners.contains(.bottomRight) {
             tempCorners.insert(.layerMaxXMaxYCorner)
         }
         self.layer.cornerRadius = radius
         self.layer.maskedCorners = tempCorners
         self.layer.masksToBounds = true
+    }
+    
+    /// 设置圆角（参数名为历史拼写错误，请改用 `setCornerRadius(corners:radius:)`）
+    @available(*, deprecated, renamed: "setCornerRadius(corners:radius:)")
+    func setCornerRadius(conrners: UIRectCorner,
+                         radius: CGFloat) {
+        setCornerRadius(corners: conrners, radius: radius)
     }
     
     // MARK: 添加阴影
@@ -114,9 +121,11 @@ public extension UIView {
         return (startPoint, endPoint)
     }
     
-    /// 移除渐变色
+    /// 移除渐变色（从 superlayer 正确移除，避免仅改数组副本无效的问题）
     func removeGradient() {
-        self.layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
+        self.layer.sublayers?
+            .compactMap { $0 as? CAGradientLayer }
+            .forEach { $0.removeFromSuperlayer() }
     }
     
     func getGradientLayer() -> CAGradientLayer? {
@@ -129,8 +138,12 @@ public extension UIView {
                                colors: [UIColor]) {
         var currentColors = colors
         
-        // 创建一个定时器来更新颜色顺序
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+        // 创建一个定时器来更新颜色顺序（弱引用 layer，避免 view 释放后仍访问）
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak gradientLayer] timer in
+            guard let gradientLayer = gradientLayer else {
+                timer.invalidate()
+                return
+            }
             // 动画渐变颜色
             let colorAnimation = CABasicAnimation(keyPath: "colors")
             colorAnimation.fromValue = currentColors.map { $0.cgColor }
@@ -497,26 +510,26 @@ public extension UIView {
             if timeout <= 0 {
                 // 倒计时结束，关闭
                 _timer.cancel()
-                DispatchQueue.main.sync(execute: { () -> Void in
+                DispatchQueue.main.async {
                     newBtn.setTitle(normalText, for: .normal)
                     if let normalTextColor = normalTextColor {
-                        newBtn.setTitleColor( normalTextColor, for: .normal)
+                        newBtn.setTitleColor(normalTextColor, for: .normal)
                     }
                     newBtn.isEnabled = true
                     newBtn.removeFromSuperview()
                     btn.isHidden = false
-                })
+                }
             } else {
                 // 正在倒计时
                 let seconds = timeout
-                DispatchQueue.main.sync(execute: { () -> Void in
+                DispatchQueue.main.async {
                     let str = String(describing: seconds)
                     newBtn.setTitle("\(runLeftText)\(str)\(runRightText)", for: .normal)
                     if let runTextColor = runTextColor {
-                        newBtn.setTitleColor( runTextColor, for: .normal)
+                        newBtn.setTitleColor(runTextColor, for: .normal)
                     }
                     newBtn.isEnabled = false
-                })
+                }
                 timeout -= 1
             }
         })
@@ -724,6 +737,7 @@ extension UIAlertAction {
         guard let ivars = class_copyIvarList(self, &outCount) else {
             return []
         }
+        defer { free(ivars) }
         var result = [String]()
         let count = Int(outCount)
         for i in 0..<count {

@@ -139,8 +139,8 @@ public class MJTipView: UIView {
             }
             
             if duration > 0 {
-                DispatchQueue.main.asyncAfter(deadline: (.now() + self.timeInterval)) {
-                    self.removeFromSuperview()
+                DispatchQueue.main.asyncAfter(deadline: (.now() + self.timeInterval)) { [weak self] in
+                    self?.removeFromSuperview()
                 }
             }
         }
@@ -237,6 +237,6 @@ public class MJTipView: UIView {
         let dic: [NSAttributedString.Key: Any] = [NSAttributedString.Key.paragraphStyle: paragraphM,
                                                   NSAttributedString.Key.underlineStyle: 0]
         attStrM.setAttributes(dic, range: NSRange(location: 0, length: attStrM.length))
-        return attStrM.copy() as! NSAttributedString
+        return NSAttributedString(attributedString: attStrM)
     }
 }

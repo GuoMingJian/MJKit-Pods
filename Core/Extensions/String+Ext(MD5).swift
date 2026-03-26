@@ -8,7 +8,7 @@
 import UIKit
 
 // MARK: - ===== String (MD5) =====
-extension String {
+public extension String {
     var md5: String {
         guard let data = self.data(using: .utf8) else {
             return self

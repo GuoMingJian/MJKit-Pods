@@ -23,6 +23,7 @@ public protocol MJBlockProtocol {
 public extension UIButton {
     func setHandle(event: UIControl.Event = .touchUpInside,
                    callBlock: ((_ button: UIButton) -> Void)? = nil) {
+        self.removeTarget(self, action: #selector(buttonAction), for: event)
         self.mjCallBack = { button in
             if let block = callBlock, let button = button {
                 block(button)
@@ -98,10 +99,10 @@ public extension UIButton {
     /// 扩大点击区域 CGFloat
     var touchExtendInset: CGFloat {
         get {
-            return objc_getAssociatedObject(self, &MJUIButtonExtendInsetKey) as? CGFloat ?? 0
+            (objc_getAssociatedObject(self, &MJUIButtonExtendInsetKey) as? NSNumber).map { CGFloat(truncating: $0) } ?? 0
         }
         set {
-            objc_setAssociatedObject(self, &MJUIButtonExtendInsetKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &MJUIButtonExtendInsetKey, NSNumber(value: Double(newValue)), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
 }

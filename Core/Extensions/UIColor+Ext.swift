@@ -41,15 +41,13 @@ public extension UIColor {
             return UIColor.clear
         }
         
-        var rang = NSRange()
-        rang.location = 0
-        rang.length = 2
+        var rgbRange = NSRange(location: 0, length: 2)
         
-        let rString = (colorString as NSString).substring(with: rang)
-        rang.location = 2
-        let gString = (colorString as NSString).substring(with: rang)
-        rang.location = 4
-        let bString = (colorString as NSString).substring(with: rang)
+        let rString = (colorString as NSString).substring(with: rgbRange)
+        rgbRange.location = 2
+        let gString = (colorString as NSString).substring(with: rgbRange)
+        rgbRange.location = 4
+        let bString = (colorString as NSString).substring(with: rgbRange)
         
         var r: UInt64 = 0, g: UInt64 = 0, b: UInt64 = 0
         

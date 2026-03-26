@@ -10,59 +10,71 @@ import UIKit
 // MARK: ===== Date =====
 public let mj_dateFormatter = DateFormatter()
 
+private let mjDateFormatterLock = NSLock()
+
+fileprivate func mjPerformWithSharedFormatter<R>(_ body: (DateFormatter) -> R) -> R {
+    mjDateFormatterLock.lock()
+    defer { mjDateFormatterLock.unlock() }
+    return body(mj_dateFormatter)
+}
+
 public extension Date {
     // MARK: 获取当前日期 "yyyy-MM-dd"
     /// 获取当前日期 "yyyy-MM-dd"
     static func currentDateString(dateFormat: String? = nil) -> String {
         let newDF: String = dateFormat ?? MJ.yyyyMMdd
-        mj_dateFormatter.dateFormat = newDF
-        return mj_dateFormatter.string(from: Date())
+        return mjPerformWithSharedFormatter { df in
+            df.dateFormat = newDF
+            return df.string(from: Date())
+        }
     }
     
     // MARK: Date -> String
     /// Date -> String
     static func dateToString(date: Date,
                              dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> String {
-        let dateFormatter = mj_dateFormatter
-        dateFormatter.dateFormat = dateFormat
-        let dateString = dateFormatter.string(from: date)
-        return dateString
+        mjPerformWithSharedFormatter { df in
+            df.dateFormat = dateFormat
+            return df.string(from: date)
+        }
     }
     
     /// Date -> String
     static func dateToString(date: Date,
                              dateFormatter: DateFormatter? = nil) -> String {
-        var newDF: DateFormatter = getDateFormatter()
-        if let dateFormatter = dateFormatter {
-            newDF = dateFormatter
+        if let df = dateFormatter {
+            return df.string(from: date)
         }
-        let dateString = newDF.string(from: date)
-        return dateString
+        return mjPerformWithSharedFormatter { df in
+            df.dateStyle = .medium
+            df.timeStyle = .none
+            df.locale = Locale.current
+            return df.string(from: date)
+        }
     }
     
     // MARK: String -> Date
     /// String -> Date
     static func stringToDate(dateString: String,
                              dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> Date {
-        let dateFormatter = mj_dateFormatter
-        dateFormatter.dateFormat = dateFormat
-        if let date = dateFormatter.date(from: dateString) {
-            return date
+        mjPerformWithSharedFormatter { df in
+            df.dateFormat = dateFormat
+            return df.date(from: dateString) ?? Date()
         }
-        return Date()
     }
     
     /// String -> Date
     static func stringToDate(dateString: String,
                              dateFormatter: DateFormatter? = nil) -> Date {
-        var newDF: DateFormatter = getDateFormatter()
-        if let dateFormatter = dateFormatter {
-            newDF = dateFormatter
+        if let df = dateFormatter {
+            return df.date(from: dateString) ?? Date()
         }
-        if let date = newDF.date(from: dateString) {
-            return date
+        return mjPerformWithSharedFormatter { df in
+            df.dateStyle = .medium
+            df.timeStyle = .none
+            df.locale = Locale.current
+            return df.date(from: dateString) ?? Date()
         }
-        return Date()
     }
     
     // MARK: 时间戳 转 字符串
@@ -115,18 +127,10 @@ public extension Date {
                                  count: Int,
                                  dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> String {
         let calendar = Calendar(identifier: .gregorian)
-        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
-        // 获取当前年份
-        guard let currentYear = components.year else {
+        guard let newDate = calendar.date(byAdding: .year, value: count, to: date) else {
             return ""
         }
-        // 更新年份
-        components.year = currentYear + count
-        // 创建新日期
-        if let newDate = calendar.date(from: components) {
-            return dateToString(date: newDate, dateFormat: dateFormat)
-        }
-        return ""
+        return dateToString(date: newDate, dateFormat: dateFormat)
     }
     
     // MARK: 获取与当前天数相差值 (count:负数为前x天，正数为后x天)
@@ -135,15 +139,10 @@ public extension Date {
                                 count: Int,
                                 dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> String {
         let calendar = Calendar(identifier: .gregorian)
-        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
-        guard let currentDay = components.day else {
+        guard let newDate = calendar.date(byAdding: .day, value: count, to: date) else {
             return ""
         }
-        components.day = currentDay + count
-        if let newDate = calendar.date(from: components) {
-            return dateToString(date: newDate, dateFormat: dateFormat)
-        }
-        return ""
+        return dateToString(date: newDate, dateFormat: dateFormat)
     }
     
     /// 获取与当前天数相差值 (count:负数为前x天，正数为后x天)
@@ -151,16 +150,10 @@ public extension Date {
                                 count: Int,
                                 dateFormatter: DateFormatter) -> String {
         let calendar = Calendar(identifier: .gregorian)
-        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
-        guard let currentDay = components.day else {
+        guard let newDate = calendar.date(byAdding: .day, value: count, to: date) else {
             return ""
         }
-        components.day = currentDay + count
-        if let newDate = calendar.date(from: components) {
-            return dateToString(date: newDate, dateFormatter: dateFormatter)
-        }
-        
-        return ""
+        return dateToString(date: newDate, dateFormatter: dateFormatter)
     }
     
     // MARK: 获取与当前小时数相差值 (count:负数为前x小时，正数为后x小时)
@@ -169,15 +162,10 @@ public extension Date {
                                   count: Int,
                                   dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> String {
         let calendar = Calendar(identifier: .gregorian)
-        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
-        guard let currentHour = components.hour else {
+        guard let newDate = calendar.date(byAdding: .hour, value: count, to: date) else {
             return ""
         }
-        components.hour = currentHour + count
-        if let newDate = calendar.date(from: components) {
-            return dateToString(date: newDate, dateFormat: dateFormat)
-        }
-        return ""
+        return dateToString(date: newDate, dateFormat: dateFormat)
     }
     
     // MARK: 获取周几 (1-7; 1: Sunday 7: Saturday)
@@ -187,45 +175,20 @@ public extension Date {
     }
     
     // MARK: 获取某一天所在的周一和周日
-    /// 获取某一天所在的周一和周日
+    /// 获取某一天所在「周」的起止（遵循 `Calendar.current` 的 `firstWeekday` 与周定义）
     static func getWeekTime(_ date: Date) -> (start: Date, end: Date) {
         let calendar = Calendar.current
-        let comp = calendar.dateComponents([.year, .month, .day, .weekday], from: date)
-        
-        // 获取今天是周几和几号
-        let weekDay = comp.weekday ?? 1 // 默认为1（星期日）
-        let day = comp.day ?? 1 // 默认为1
-        
-        // 计算当前日期和本周的星期一和星期天相差的天数
-        var firstDiff: Int
-        var lastDiff: Int
-        
-        if weekDay == 1 {
-            firstDiff = -6
-            lastDiff = 0
-        } else {
-            firstDiff = calendar.firstWeekday - weekDay + 1
-            lastDiff = 8 - weekDay
+        guard let interval = calendar.dateInterval(of: .weekOfYear, for: date) else {
+            return (date, date)
         }
-        
-        // 计算本周的开始和结束日期
-        var firstDayComp = calendar.dateComponents([.year, .month, .day], from: date)
-        firstDayComp.day = (day + firstDiff)
-        
-        var lastDayComp = calendar.dateComponents([.year, .month, .day], from: date)
-        lastDayComp.day = (day + lastDiff)
-        
-        let firstDayOfWeek = calendar.date(from: firstDayComp) ?? date // 如果失败，使用原日期
-        let lastDayOfWeek = calendar.date(from: lastDayComp) ?? date // 如果失败，使用原日期
-        
-        return (firstDayOfWeek, lastDayOfWeek)
+        let endInclusive = calendar.date(byAdding: .second, value: -1, to: interval.end) ?? interval.end
+        return (interval.start, endInclusive)
     }
     
-    // MARK: 获取传入月份当天（当月天数）
-    /// 获取传入月份当天（当月天数）
+    // MARK: 获取日期在当月是第几天
+    /// 指定日期在日历上对应的「日」分量（1–31），即当月第几天；若需该月总天数请用 `daysInMonth(date:)`
     static func getDayCount(date: Date = Date()) -> Int {
-        let calendar = Calendar.current
-        return calendar.component(.day, from: date)
+        Calendar.current.component(.day, from: date)
     }
     
     // MARK: 获取当月开始日期
@@ -293,14 +256,7 @@ public extension Date {
     // MARK: 判断是否为昨天
     /// 判断是否为昨天
     func isYesterday() -> Bool {
-        let calendar = Calendar.current
-        let now = Date()
-        let dateComponents = calendar.dateComponents([.year, .month, .day], from: self)
-        let todayComponents = calendar.dateComponents([.year, .month, .day], from: now)
-        if dateComponents.year == todayComponents.year && dateComponents.month == todayComponents.month && dateComponents.day == todayComponents.day! - 1 {
-            return true
-        }
-        return false
+        Calendar.current.isDateInYesterday(self)
     }
     
     // MARK: 计算两个时间相差多少秒
@@ -542,17 +498,11 @@ public extension Date {
     
     /// 获取当前时间TimeZone
     static func getLocalTimeZone() -> String {
-        var result: String = ""
         let timeZoneIdentifier = TimeZone.current.identifier
-        for (_, item) in TimeZone.abbreviationDictionary.enumerated() {
-            if item.value == timeZoneIdentifier {
-                result = item.key
-            }
+        if let abbrev = TimeZone.abbreviationDictionary.first(where: { $0.value == timeZoneIdentifier })?.key {
+            return abbrev
         }
-        if result == "" {
-            result = timeZoneIdentifier
-        }
-        return result
+        return timeZoneIdentifier
     }
     
     // MARK: 获取系统语言 string
@@ -565,33 +515,39 @@ public extension Date {
     // MARK: 获取 DateFormatter
     /// 获取 DateFormatter
     static func getDateFormatter(timeZone: TimeZone? = nil) -> DateFormatter {
-        let dateFormatter = mj_dateFormatter
-        dateFormatter.dateStyle = .medium
-        dateFormatter.timeStyle = .none
-        //dateFormatter.locale = Locale(identifier: xxx)
-        dateFormatter.locale = Locale.current
-        if let timeZone = timeZone {
-            dateFormatter.timeZone = timeZone
+        mjPerformWithSharedFormatter { df in
+            df.dateStyle = .medium
+            df.timeStyle = .none
+            df.locale = Locale.current
+            df.timeZone = timeZone ?? .current
+            return df
         }
-        return dateFormatter
     }
     
     /// 获取 DateFormatter
     static func getDateFormatter(timeZone: TimeZone,
                                  dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> DateFormatter {
-        let dateFormatter = mj_dateFormatter
-        dateFormatter.timeZone = timeZone
-        dateFormatter.dateFormat = dateFormat
-        return dateFormatter
+        mjPerformWithSharedFormatter { df in
+            df.dateStyle = .none
+            df.timeStyle = .none
+            df.locale = Locale.current
+            df.timeZone = timeZone
+            df.dateFormat = dateFormat
+            return df
+        }
     }
     
     // MARK: 获取 UTC DateFormatter
     /// 获取 UTC DateFormatter
     static func getUTCDateFormatter(dateFormat: String = "yyyy-MM-dd HH:mm:ss") -> DateFormatter {
-        let dateFormatter = mj_dateFormatter
-        dateFormatter.timeZone = utcTimeZone()
-        dateFormatter.dateFormat = dateFormat
-        return dateFormatter
+        mjPerformWithSharedFormatter { df in
+            df.dateStyle = .none
+            df.timeStyle = .none
+            df.locale = Locale.current
+            df.timeZone = utcTimeZone()
+            df.dateFormat = dateFormat
+            return df
+        }
     }
     
     /// UTC TimeZone
@@ -626,25 +582,27 @@ public extension Date {
     static func getDateFrom(dateString: String,
                             dateFormat: String = "yyyy-MM-dd HH:mm:ss",
                             timeZone: TimeZone) -> Date? {
-        var dateToReturn: Date?
-        let formatter = mj_dateFormatter
-        formatter.timeZone = timeZone
-        formatter.locale = Locale(identifier: timeZone.identifier)
-        formatter.dateFormat = dateFormat
-        dateToReturn = formatter.date(from: dateString)
-        return dateToReturn
+        mjPerformWithSharedFormatter { formatter in
+            formatter.dateStyle = .none
+            formatter.timeStyle = .none
+            formatter.timeZone = timeZone
+            formatter.locale = Locale(identifier: timeZone.identifier)
+            formatter.dateFormat = dateFormat
+            return formatter.date(from: dateString)
+        }
     }
     
     static func getStringFrom(date: Date,
                               dateFormat: String = "yyyy-MM-dd HH:mm:ss",
                               timeZone: TimeZone) -> String? {
-        var stringToReturn: String?
-        let formatter = mj_dateFormatter
-        formatter.timeZone = timeZone
-        formatter.locale = Locale(identifier: timeZone.identifier)
-        formatter.dateFormat = dateFormat
-        stringToReturn = formatter.string(from: date)
-        return stringToReturn
+        mjPerformWithSharedFormatter { formatter in
+            formatter.dateStyle = .none
+            formatter.timeStyle = .none
+            formatter.timeZone = timeZone
+            formatter.locale = Locale(identifier: timeZone.identifier)
+            formatter.dateFormat = dateFormat
+            return formatter.string(from: date)
+        }
     }
     
     // MARK: 时间戳（统一处理为10位，异常时为0）
