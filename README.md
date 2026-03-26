@@ -6,7 +6,7 @@ iOS Developer Tools
  # 2. 更新版本号（例如 1.0.2）
  # 3. 打 tag
  git tag 1.0.2
- git push --tags
+ git push origin 1.0.2
 
  # 4. 修改 podspec 中的版本号
  # s.version = "1.0.2"
