@@ -46,20 +46,17 @@ public class MJLocationManager: NSObject {
     public static var shared: MJLocationManager {
         struct Static {
             static var instance: MJLocationManager?
-            static var onceToken: Int = 0
         }
         
         if Static.instance == nil {
             Static.instance = MJLocationManager()
-            
-            // 使用异步方式处理授权请求，避免死锁
-            DispatchQueue.main.async {
-                MJAuthorization.requestAuth(type: .locationWhenInUse) {
-                    Static.instance?.setup()
-                }
-            }
         }
         return Static.instance!
+    }
+    
+    private override init() {
+        super.init()
+        setup()
     }
     
     // MARK: - Properties

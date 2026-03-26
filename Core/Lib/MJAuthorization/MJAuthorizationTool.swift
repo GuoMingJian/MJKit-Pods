@@ -212,6 +212,19 @@ public class MJAuthorizationTool: NSObject, CLLocationManagerDelegate, CBCentral
     ///   - level: 授权等级
     ///   - completionHandler: 授权回调
     public static func requestLocationAuthorization(level: KLocationAuthLevel, completionHandler: @escaping (Bool) -> Void) {
+        let mapped = locationAuthorizationStatus()
+        if mapped == .authorized || mapped == .limited {
+            DispatchQueue.main.async {
+                completionHandler(true)
+            }
+            return
+        }
+        if mapped == .denied || mapped == .restricted {
+            DispatchQueue.main.async {
+                completionHandler(false)
+            }
+            return
+        }
         MJAuthorizationTool.instance.locationCompletionHandler = completionHandler
         if level == .whenInUse {
             instance.locationManager.requestWhenInUseAuthorization()
@@ -230,23 +243,33 @@ public class MJAuthorizationTool: NSObject, CLLocationManagerDelegate, CBCentral
     
     // MARK: - CLLocationManagerDelegate
     public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        let status = MJAuthorizationTool.locationAuthorizationStatus()
-        if status == .authorized || status == .limited {
+        let status = manager.authorizationStatus
+        switch status {
+        case .authorizedAlways, .authorizedWhenInUse:
             self.locationCompletionHandler?(true)
             self.locationCompletionHandler = nil
-        } else {
+        case .denied, .restricted:
             self.locationCompletionHandler?(false)
             self.locationCompletionHandler = nil
+        case .notDetermined:
+            break
+        @unknown default:
+            break
         }
     }
     
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if status == .authorizedAlways || status == .authorizedWhenInUse {
+        switch status {
+        case .authorizedAlways, .authorizedWhenInUse:
             self.locationCompletionHandler?(true)
             self.locationCompletionHandler = nil
-        } else {
+        case .denied, .restricted:
             self.locationCompletionHandler?(false)
             self.locationCompletionHandler = nil
+        case .notDetermined:
+            break
+        @unknown default:
+            break
         }
     }
     
