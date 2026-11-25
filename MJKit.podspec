@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name            = 'MJKit'
-  s.version         = '1.0.4'
+  s.version         = '1.0.5'
   s.summary         = 'iOS开发基础组件'
   s.description     = '封装了扩展、工具函数、UI组件等'
 
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
     :tag => s.version
   }
 
-  s.ios.deployment_target = "14.0"
+  s.ios.deployment_target = "15.0"
   s.swift_versions        = ['5.0']
   s.source_files          = 'Core/**/*.{h,m,swift}'
   s.resources             = [

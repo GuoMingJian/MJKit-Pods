@@ -29,11 +29,20 @@ public class BaseTableView: UITableView {
     }
     
     // MARK: -
+    /// 下拉刷新头部样式（等同于 `MJRefreshHeaderStyle`）
+    public typealias HeaderStyle = MJRefreshHeaderStyle
+    
     /// 文字/菊花颜色（默认黑色）
     public var loadingColor: UIColor?
     
     /// 是否支持下拉刷新
     public var isCanRefresh: Bool = false {
+        didSet {
+            setupHeaderRefresh()
+        }
+    }
+    /// 下拉刷新头部样式（默认 `.normal`；`.gif` 只显示动画、无文字）
+    public var refreshHeaderStyle: HeaderStyle = .normal {
         didSet {
             setupHeaderRefresh()
         }
@@ -67,12 +76,18 @@ public class BaseTableView: UITableView {
     public var footerRefreshBlock: (() -> Void)?
     
     // MARK: -
-    private let mjHeader = MJRefreshNormalHeader()
-    private let mjFooter = MJRefreshBackNormalFooter()
+    private lazy var mjNormalHeader = MJRefreshNormalHeader()
+    private lazy var mjGifHeader = MJGifHeader()
+    private lazy var mjFooter = MJRefreshBackNormalFooter()
+    
+    /// 当前使用的刷新头部（跟随 `refreshHeaderStyle`）
+    private var currentHeader: MJRefreshHeader {
+        return refreshHeaderStyle == .gif ? mjGifHeader : mjNormalHeader
+    }
     
     // MARK: -
     public func endRefresh(isHasMoreData: Bool = true) {
-        self.mjHeader.endRefreshing()
+        self.mj_header?.endRefreshing()
         if isHasMoreData {
             self.mjFooter.endRefreshing()
         } else {
@@ -81,22 +96,23 @@ public class BaseTableView: UITableView {
     }
     
     private func setupHeaderRefresh() {
-        if isCanRefresh {
-            // refreshing
-            mjHeader.setRefreshingTarget(self, refreshingAction: #selector(mjHeaderRefresh))
-            // 文字/菊花颜色
-            if let loadingColor = loadingColor {
-                mjHeader.stateLabel?.textColor = loadingColor
-                mjHeader.lastUpdatedTimeLabel?.textColor = loadingColor
-                mjHeader.loadingView?.color = loadingColor
-                // 隐藏文字
-                //mjHeader.stateLabel?.isHidden = true
-                //mjHeader.lastUpdatedTimeLabel?.isHidden = true
-            }
-            self.mj_header = mjHeader
-        } else {
+        guard isCanRefresh else {
             self.mj_header = nil
+            return
         }
+        let header = currentHeader
+        header.setRefreshingTarget(self, refreshingAction: #selector(mjHeaderRefresh))
+        // 文字/菊花颜色（GIF 头部无文字，配置无效）
+        if let normalHeader = header as? MJRefreshNormalHeader,
+           let loadingColor = loadingColor {
+            normalHeader.stateLabel?.textColor = loadingColor
+            normalHeader.lastUpdatedTimeLabel?.textColor = loadingColor
+            normalHeader.loadingView?.color = loadingColor
+            // 隐藏文字
+            //normalHeader.stateLabel?.isHidden = true
+            //normalHeader.lastUpdatedTimeLabel?.isHidden = true
+        }
+        self.mj_header = header
     }
     
     private func setupFooterRefresh() {
